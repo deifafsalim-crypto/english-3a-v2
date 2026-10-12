@@ -2,3 +2,8 @@
 .edge-*/
 __pycache__/
 *.pyc
+private-activation/
+.activation-browser-test/
+signing-key.json
+إصدار-أكواد-الدخول.html
+*private-activation*.html

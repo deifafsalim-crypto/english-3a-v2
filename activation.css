@@ -1,0 +1,32 @@
+/* Locked by default, including direct lesson routes and printed pages. */
+html:not([data-activation="active"]) .nav,
+html:not([data-activation="active"]) #app,
+html:not([data-activation="active"]) #modal,
+html:not([data-activation="active"]) .rights-footer,
+html:not([data-activation="active"]) #rightsDialog{display:none!important}
+.activation-gate[hidden]{display:none!important}
+.activation-gate{max-width:680px;margin:48px auto;padding:32px;background:var(--paper);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);line-height:1.85}
+.activation-brand{display:flex;align-items:center;gap:12px;margin-bottom:20px;font-weight:800;color:var(--toneInk)}
+.activation-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:17px;background:var(--toneSoft);font-size:27px}
+.activation-gate h1{font-size:30px;line-height:1.5;margin:8px 0 12px}
+.activation-gate p{margin:10px 0}
+.activation-intro,.activation-help{color:var(--muted)}
+.activation-steps{margin:20px 0;padding:0;list-style:none;display:grid;gap:12px}
+.activation-steps li{display:flex;align-items:flex-start;gap:10px;font-size:16px}
+.activation-step-number{flex-shrink:0;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--toneSoft);color:var(--toneInk);font-weight:800}
+.activation-gate label{display:block;font-size:16px;font-weight:700;margin:18px 0 8px}
+.activation-gate textarea{width:100%;display:block;resize:vertical;min-height:74px;padding:13px 15px;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);font:15px/1.8 Consolas,'Segoe UI',monospace;direction:ltr;text-align:left;overflow-wrap:anywhere}
+.activation-gate textarea:read-only{background:var(--toneSoft);color:var(--toneInk)}
+.activation-actions{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0 20px}
+.activation-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 18px;border:1px solid var(--line);border-radius:14px;background:var(--toneSoft);color:var(--toneInk);font:inherit;font-size:16px;font-weight:700;text-decoration:none;cursor:pointer}
+.activation-button.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.activation-button:disabled{opacity:.5;cursor:wait}
+.activation-button:focus-visible,.activation-gate textarea:focus-visible{outline:3px solid var(--toneInk);outline-offset:4px}
+.activation-separator{height:1px;background:var(--line);margin:24px 0}
+.activation-help{font-size:14px}
+.activation-status{font-size:16px;min-height:30px}
+.activation-status[data-error="true"]{color:var(--no);font-weight:700}
+.activation-legal{border-top:1px solid var(--line);padding-top:18px;margin-top:22px;font-size:13px;color:var(--muted);text-align:center}
+.activation-gate a[aria-disabled="true"]{pointer-events:none;opacity:.5}
+@media(max-width:680px){.activation-gate{margin:24px 16px;padding:24px}.activation-gate h1{font-size:26px}.activation-actions>*{flex:1 1 180px}.activation-gate textarea{font-size:16px}}
+@media print{html:not([data-activation="active"]) body>*{display:none!important}html:not([data-activation="active"]) #activationGate{display:block!important}.activation-actions,#activationForm,.activation-steps,.activation-gate label,.activation-gate textarea{display:none!important}.activation-gate{box-shadow:none;margin:0;border:0}}

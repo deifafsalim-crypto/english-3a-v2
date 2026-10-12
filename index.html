@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-activation="locked">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -270,8 +270,39 @@ h2.sec{font-size:26px;font-weight:800;margin:44px 4px 14px}
 @media(max-width:520px){.rights-footer{margin:28px 16px 20px;padding:18px}.rights-dialog{padding:22px}.rights-actions>*{width:100%}}
 @media print{.rights-dialog,.rights-contact,.rights-accept{display:none!important}.rights-footer{break-inside:avoid;color:#000;background:#fff;border-color:#aaa}}
 </style>
+
+<style id="activationCritical">
+html:not([data-activation="active"]) .nav,html:not([data-activation="active"]) #app,html:not([data-activation="active"]) #modal,html:not([data-activation="active"]) .rights-footer,html:not([data-activation="active"]) #rightsDialog{display:none!important}
+</style>
+<link rel="stylesheet" href="activation.css?v=20261012-1">
 </head>
 <body>
+<section class="activation-gate" id="activationGate" aria-labelledby="activationTitle">
+  <div class="activation-brand"><span class="activation-icon" aria-hidden="true">🤖</span><span>نادي أتومك للإنجليزي<br><small>الصف الثالث</small></span></div>
+  <h1 id="activationTitle">فعّلي الدخول إلى المنصة</h1>
+  <p class="activation-intro">الدخول مخصص للمشتركين. يحتاج هذا المتصفح إلى كود تفعيل مرة واحدة، ثم يُحفظ دخولك عليه.</p>
+  <ol class="activation-steps">
+    <li><span class="activation-step-number" aria-hidden="true">١</span><span>أرسلي رقم الطلب إلى صاحبة المنصة على واتساب.</span></li>
+    <li><span class="activation-step-number" aria-hidden="true">٢</span><span>بعد استلام كود التفعيل، الصقيه هنا لفتح المنصة.</span></li>
+  </ol>
+  <label for="activationRequest">رقم طلب هذا المتصفح</label>
+  <textarea id="activationRequest" dir="ltr" readonly spellcheck="false" rows="2" aria-describedby="activationBrowserNote" placeholder="جارٍ تجهيز رقم الطلب…"></textarea>
+  <div class="activation-actions">
+    <button class="activation-button" id="activationCopy" type="button" disabled>نسخ رقم الطلب</button>
+    <a class="activation-button" id="activationWhatsApp" href="https://wa.me/96895823294" target="_blank" rel="noopener noreferrer" aria-disabled="true" tabindex="-1">إرسال الطلب عبر واتساب · <bdi dir="ltr">95823294</bdi></a>
+  </div>
+  <div class="activation-separator" aria-hidden="true"></div>
+  <form id="activationForm">
+    <label for="activationCode">كود التفعيل</label>
+    <textarea id="activationCode" dir="ltr" spellcheck="false" autocomplete="off" autocapitalize="off" maxlength="512" rows="3" placeholder="الصقي كود التفعيل كاملًا هنا" aria-describedby="activationStatus" required disabled></textarea>
+    <div class="activation-actions"><button class="activation-button primary" id="activationSubmit" type="submit" disabled>تفعيل وفتح المنصة</button></div>
+  </form>
+  <p class="activation-status" id="activationStatus" role="status" aria-live="polite">جارٍ تجهيز التفعيل…</p>
+  <p class="activation-help" id="activationBrowserNote">الكود خاص بهذا المتصفح. استخدام متصفح أو جهاز آخر، أو مسح بيانات الموقع، يحتاج إلى طلب تفعيل جديد. افتحي المنصة في المتصفح الذي تريدين استخدامه دائمًا.</p>
+  <noscript><p>فعّلي JavaScript في المتصفح ثم حدّثي الصفحة لتتمكني من تفعيل المنصة.</p></noscript>
+  <div class="activation-legal">جميع الحقوق محفوظة © 2026 لصاحبة المنصة.<br>للاستخدام الشخصي للمشترك فقط. لا أُحلّل نسخ المنصة أو نشرها أو إعادة توزيعها دون إذن مني.</div>
+</section>
+
 <nav class="nav"><div class="nav-in">
   <a href="#/" id="nHome" class="brand">🤖 نادي أتومك</a>
   <a href="#/exam" id="nExam">🏆 الاختبار الشامل</a>
@@ -634,6 +665,7 @@ const totalStars=()=>UNITS.reduce((s,u)=>{const p=store.quiz[u.id];return s+(p==
 /* router */
 window.addEventListener('hashchange',route);
 function route(){
+  if (document.documentElement.dataset.activation !== 'active') return;
   try{speechSynthesis.cancel()}catch(e){}
   const p=location.hash.replace(/^#\/?/,'').split('/').filter(Boolean);
   $('#nHome').classList.toggle('on',!p.length);$('#nExam').classList.toggle('on',p[0]==='exam');
@@ -919,8 +951,17 @@ route();
     dialog.close();
     document.getElementById('nHome').focus();
   });
-  if (!accepted) dialog.showModal();
+  const showRights = () => {
+    if (document.documentElement.dataset.activation !== 'active') return;
+    if (!accepted && !dialog.open) dialog.showModal();
+  };
+  document.addEventListener('atomic:activated', showRights);
+  showRights();
 })();
 </script>
+
+<script src="activation-core.js?v=20261012-1"></script>
+<script src="activation-public-key.js?v=20261012-1"></script>
+<script src="activation.js?v=20261012-1"></script>
 </body>
 </html>
