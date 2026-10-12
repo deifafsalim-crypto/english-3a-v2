@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <title>إصدار أكواد الدخول — نادي أتومك</title>
+  <link rel="stylesheet" href="owner.css?v=20261012-1">
+</head>
+<body>
+<main>
+  <div class="brand"><span aria-hidden="true">🤖</span><div>نادي أتومك<small>أداة خاصة بصاحبة المنصة</small></div></div>
+  <h1>إصدار أكواد الدخول</h1>
+  <section id="ownerLogin" aria-labelledby="loginTitle">
+    <h2 id="loginTitle">افتحي أداة الإصدار</h2>
+    <p class="help">أدخلي كلمة المرور الخاصة بك لإصدار أكواد المشتركين من هذا المتصفح.</p>
+    <form id="unlockForm">
+      <label for="ownerPassword">كلمة المرور</label>
+      <div class="password-row">
+        <input id="ownerPassword" type="password" name="password" dir="ltr" autocomplete="current-password" spellcheck="false" maxlength="256" required aria-describedby="status">
+        <button id="togglePassword" class="secondary" type="button" aria-label="إظهار كلمة المرور" aria-pressed="false">إظهار</button>
+      </div>
+      <div class="actions"><button id="unlockButton" type="submit">فتح أداة الإصدار</button></div>
+    </form>
+    <p class="note">كلمة المرور محفوظة في ملف بيانات الدخول الخاص بك. احتفظي بها عندك فقط.</p>
+  </section>
+  <section id="ownerWorkspace" hidden aria-labelledby="issueTitle">
+    <div class="workspace-head"><h2 id="issueTitle">إنشاء كود للمشترك</h2><button id="lockOwner" class="secondary" type="button">قفل الأداة</button></div>
+    <p class="help">الصقي رقم الطلب الذي وصلك على واتساب، ثم أنشئي الكود وأرسليه لصاحب الطلب.</p>
+    <form id="issueForm">
+      <label for="requestInput">رقم طلب المشترك</label>
+      <textarea id="requestInput" dir="ltr" spellcheck="false" autocomplete="off" autocapitalize="characters" maxlength="100" rows="2" placeholder="A3-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX" required></textarea>
+      <div class="actions"><button id="issueButton" type="submit">إنشاء كود التفعيل</button></div>
+    </form>
+    <section id="result" hidden>
+      <label for="codeOutput">كود التفعيل</label>
+      <textarea id="codeOutput" dir="ltr" readonly spellcheck="false" rows="4"></textarea>
+      <div class="actions"><button id="copyCode" type="button">نسخ الكود</button></div>
+      <p class="help">أرسلي الكود كاملًا. يعمل لرقم الطلب المحدد فقط.</p>
+    </section>
+    <p class="note">تُقفل الأداة عند تحديث الصفحة أو بعد ١٠ دقائق بدون استخدام. اضغطي «قفل الأداة» عند الانتهاء.</p>
+  </section>
+  <p id="status" role="status" aria-live="polite">جارٍ تجهيز أداة الإصدار…</p>
+  <noscript><p>فعّلي JavaScript في المتصفح ثم حدّثي الصفحة.</p></noscript>
+</main>
+<script src="activation-core.js?v=20261012-1"></script>
+<script src="activation-public-key.js?v=20261012-1"></script>
+<script src="issuer-crypto.js?v=20261012-1"></script>
+<script src="issuer-vault.js?v=20261012-1"></script>
+<script src="owner.js?v=20261012-1"></script>
+</body>
+</html>

@@ -18,6 +18,8 @@ import websocket
 PUBLIC = Path(__file__).resolve().parents[1]
 WORKSPACE = PUBLIC.parent
 ISSUER = WORKSPACE / 'private-activation' / 'إصدار-أكواد-الدخول.html'
+HOSTED_ISSUER = os.environ.get('ACTIVATION_HOSTED_ISSUER') == '1'
+OWNER_PASSWORD_FILE = WORKSPACE / 'private-activation' / 'owner-password.txt'
 CHROME = Path(r'C:\Program Files\Google\Chrome\Application\chrome.exe')
 STORAGE = 'atomic3a-browser-activation-v1'
 assert ISSUER.exists(), 'Generate the local private issuer before running this integration test.'
@@ -118,9 +120,24 @@ try:
         if page.evaluate("document.getElementById('rightsDialog').open"):
             page.evaluate("document.getElementById('rightsAccept').click()")
 
-    issuer, _ = new_page(ISSUER.as_uri())
+    issuer, _ = new_page(base + 'owner.html' if HOSTED_ISSUER else ISSUER.as_uri())
     issuer.wait("!!document.getElementById('issueForm') && typeof AtomicActivation === 'object'")
     assert issuer.evaluate('!!crypto.subtle'), 'Offline issuer must support Web Crypto from file://.'
+
+    def unlock_owner(page):
+        owner_password = OWNER_PASSWORD_FILE.read_text(encoding='utf-8').strip()
+        page.evaluate("document.getElementById('ownerPassword').value=" + json.dumps(owner_password) + ";document.getElementById('unlockForm').requestSubmit()")
+        page.wait("!document.getElementById('ownerWorkspace').hidden")
+        assert page.evaluate("document.getElementById('ownerPassword').value") == ''
+
+    if HOSTED_ISSUER:
+        issuer.wait("typeof AtomicIssuerCrypto === 'object' && !!window.ATOMIC_ISSUER_VAULT")
+        assert issuer.evaluate("document.getElementById('ownerWorkspace').hidden")
+        issuer.evaluate("document.getElementById('ownerPassword').value='deliberately-wrong-password';document.getElementById('unlockForm').requestSubmit()")
+        issuer.wait("document.getElementById('status').textContent.includes('كلمة المرور غير صحيحة')")
+        assert issuer.evaluate("document.getElementById('ownerWorkspace').hidden")
+        unlock_owner(issuer)
+        assert issuer.evaluate('localStorage.length === 0 && sessionStorage.length === 0'), 'Owner credentials must not persist in browser storage.'
 
     def issue(id):
         issuer.evaluate("document.getElementById('requestInput').value=" + json.dumps(id) + ";document.getElementById('issueForm').requestSubmit()")
@@ -223,6 +240,42 @@ try:
     issuer.evaluate("document.getElementById('requestInput').value='invalid';document.getElementById('issueForm').requestSubmit()")
     issuer.wait("document.getElementById('status').textContent.includes('غير صحيح')")
     assert issuer.evaluate("document.getElementById('result').hidden")
+
+    if HOSTED_ISSUER:
+        issuer.call('Emulation.setDeviceMetricsOverride', width=390, height=844, deviceScaleFactor=1, mobile=True)
+        assert issuer.evaluate('document.documentElement.scrollWidth <= document.documentElement.clientWidth')
+        # Explicit logout clears code and request; calling the form while locked cannot sign.
+        issue(id_b)
+        issuer.evaluate("document.getElementById('lockOwner').click()")
+        assert issuer.evaluate("document.getElementById('ownerWorkspace').hidden && document.getElementById('codeOutput').value === '' && document.getElementById('requestInput').value === ''")
+        issuer.evaluate("document.getElementById('requestInput').value=" + json.dumps(id_b) + ";document.getElementById('issueForm').requestSubmit()")
+        assert issuer.evaluate("document.getElementById('result').hidden && document.getElementById('codeOutput').value === ''")
+        unlock_owner(issuer)
+        issuer.call('Page.reload')
+        issuer.wait("!!document.getElementById('ownerLogin') && typeof AtomicIssuerCrypto === 'object'")
+        assert issuer.evaluate("document.getElementById('ownerWorkspace').hidden && !document.getElementById('ownerLogin').hidden")
+        unlock_owner(issuer)
+        # Advance the clock instead of sleeping ten minutes; visibility checks must lock.
+        issuer.evaluate("const realNow=Date.now;Date.now=()=>realNow()+11*60*1000;document.dispatchEvent(new Event('visibilitychange'))")
+        assert issuer.evaluate("document.getElementById('ownerWorkspace').hidden && document.getElementById('status').textContent.includes('انتهت جلسة')")
+        issuer.evaluate('Date.now=realNow')
+        unlock_owner(issuer)
+        # Pending signing must not display a code after a logout.
+        issuer.evaluate("document.getElementById('requestInput').value=" + json.dumps(id_b) + ";document.getElementById('issueForm').requestSubmit();document.getElementById('lockOwner').click()")
+        time.sleep(.2)
+        assert issuer.evaluate("document.getElementById('ownerWorkspace').hidden && document.getElementById('codeOutput').value === ''")
+        assert issuer.evaluate('localStorage.length === 0 && sessionStorage.length === 0')
+        # The encrypted recovery tool also works offline with the same password and key.
+        offline_path = WORKSPACE / 'private-activation' / 'أداة-الإصدار-المشفرة-بدون-إنترنت.html'
+        offline, _ = new_page(offline_path.as_uri())
+        offline.wait("typeof AtomicIssuerCrypto === 'object' && !!document.getElementById('ownerLogin')")
+        unlock_owner(offline)
+        offline.evaluate("document.getElementById('requestInput').value=" + json.dumps(id_b) + ";document.getElementById('issueForm').requestSubmit()")
+        offline.wait("!document.getElementById('result').hidden")
+        recovery_code = offline.evaluate("document.getElementById('codeOutput').value")
+        b.evaluate("document.getElementById('activationCode').value=" + json.dumps(recovery_code) + ";document.getElementById('activationForm').requestSubmit()")
+        active(b)
+        print('PASS: hosted owner rejects wrong passwords, issues compatible codes, stores no credentials, locks on logout/refresh/idle, cancels pending results, fits mobile, and has a working encrypted offline recovery tool.')
     assert all(not connection.exceptions for connection in connections), 'Unexpected browser JavaScript exception.'
     print('PASS: offline issuer, first visit, invalid code, signature verification, browser binding, refresh, rights, route navigation, clipboard fallback, mobile layout, keyboard focus, print lock, data clearing, cross-tab activation, corrupted token and blocked storage.')
 finally:

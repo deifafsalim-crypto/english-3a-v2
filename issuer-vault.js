@@ -1,0 +1,2 @@
+/* Encrypted signing key only. Password is never published. */
+window.ATOMIC_ISSUER_VAULT = Object.freeze({"version":1,"kdf":"PBKDF2-SHA256","iterations":600000,"salt":"6ijp0U4R3jCwj5Xqiu-g3Q","iv":"OWZRJUv2HOoi9YmI","ciphertext":"j7af89gLs4-zEDdVNlR3fk0Z6nQm2QV90RDL59gyPtGhzjpx2GNEGCZZbnvUgrdGZfk3Wisy6nZ05Pb4Al9oOevEO9CdHnyqH58J0Ju07mvUrK_Z1qlkZECMaIpSlzRpG7oEOuNl7V7IhDZasCkLHOeD2OieBeYfIaiXF3UQ2rQkKDyxTG99SiZ4kXX2WtczYRcCjch9kAza7w"});
